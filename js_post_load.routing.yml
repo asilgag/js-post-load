@@ -1,0 +1,7 @@
+js_post_load.settings:
+  path: '/admin/config/development/performance/js-post-load'
+  defaults:
+    _form: \Drupal\js_post_load\Form\JsPostLoadSettingsForm
+    _title: 'JS Post Load: Settings'
+  requirements:
+    _permission: 'administer site configuration'

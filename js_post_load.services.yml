@@ -1,0 +1,3 @@
+services:
+  js_post_load:
+    class: Drupal\js_post_load\Service\JsPostLoadService

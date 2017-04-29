@@ -1,0 +1,8 @@
+name: JS Post Load
+description: Loads all Javascript located at page bottom after the onLoad event has been fired. This truly deferres the load of JS files.
+package: Page Speed Optimization
+type: module
+configure: js_post_load.settings
+
+core: 8.x
+version: 1.0

@@ -1,0 +1,5 @@
+js_post_load.settings:
+  title: JS Post Load
+  parent: system.performance_settings
+  description: JS Post Load settings.
+  route_name: js_post_load.settings

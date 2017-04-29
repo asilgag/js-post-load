@@ -1,0 +1,87 @@
+<?php
+
+namespace Drupal\js_post_load\Render;
+
+use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Render\Markup;
+
+/**
+ * {@inheritdoc}
+ */
+class HtmlResponseAttachmentsProcessor extends \Drupal\Core\Render\HtmlResponseAttachmentsProcessor {
+
+
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function processAssetLibraries(AttachedAssetsInterface $assets, array $placeholders) {
+    // Get parent's assets
+    $variables = parent::processAssetLibraries($assets, $placeholders);
+
+    // Disabled for non-anonymous visits
+    if (!\Drupal::currentUser()->isAnonymous()) {
+      return $variables;
+    }
+
+    // Get module's service
+    $jsPostLoadService = \Drupal::service('js_post_load');
+
+    // Check if module is enabled
+    if (!$jsPostLoadService->isEnabled()) {
+      return $variables;
+    }
+
+    $entity = null;
+    $entityId = null;
+
+    // Get current entity's data
+    // Try node and taxonomy_term
+    $entitiesToTry = ['node', 'taxonomy_term'];
+    foreach ($entitiesToTry as $entityToTry) {
+      $entity = \Drupal::routeMatch()->getParameter($entityToTry);
+      if ($entity) {
+        break;
+      }
+    }
+
+    if ($entity){
+      $entityId = $entity->id();
+    } else {
+      return $variables;
+    }
+
+    // Check if this entity id is excluded
+    if ($jsPostLoadService->isEntityIdExcluded($entityId)) {
+      return $variables;
+    }
+
+    // get all JS paths to be loaded at page bottom
+    $jsToLoad = [];
+    foreach($variables['scripts_bottom'] as $key => $scriptsBottom) {
+      if (!empty($scriptsBottom['#attributes']['src'])) {
+        $jsToLoad[] = '"'.$scriptsBottom['#attributes']['src'].'"';
+        unset($variables['scripts_bottom'][$key]);
+      }
+    }
+    // create a JS string to call downloadJSAtOnload() function
+    $urlsToLoadArray = '['.implode(',', $jsToLoad).']';
+
+    // Add varvy.com's downloadJSAtOnload
+    // (https://varvy.com/pagespeed/defer-loading-javascript.html)
+    $themePath = drupal_get_path('module', 'js_post_load');
+    $downloadJSAtOnloadContent = file_get_contents(
+      $themePath.'/includes/downloadJSAtOnload.min.js'
+    );
+    $variables['scripts_bottom'][] = [
+      '#markup' => Markup::create(
+        '<script>'.
+        str_replace('urls', $urlsToLoadArray, $downloadJSAtOnloadContent).
+        '</script>'
+      )
+    ];
+
+    return $variables;
+  }
+
+}

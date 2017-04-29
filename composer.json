@@ -1,0 +1,12 @@
+{
+  "name": "asilgag/js_post_load",
+  "description": "Drupal 8 module. Loads all Javascript located at page bottom after the onLoad event has been fired. This truly deferres the load of JS files.",
+  "type": "drupal-module",
+  "homepage": "https://twitter.com/asilgag",
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "8.0.x-dev"
+    }
+  }
+}
