@@ -33,7 +33,7 @@ class JsPostLoadSettingsForm extends ConfigFormBase {
 
     $form['js_post_load_excluded_ids'] = array(
       '#type' => 'textarea',
-      '#title' => $this->t('Exclude entity ids'),
+      '#title' => $this->t('Excluded entities ids'),
       '#required' => FALSE,
       '#description' => t('Enter ids of entities (one per line) which should not be processed. These nodes will load JS as usual.'),
       '#default_value' => $config->get('excluded_ids'),
