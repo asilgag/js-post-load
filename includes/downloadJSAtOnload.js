@@ -2,6 +2,7 @@ function downloadJSAtOnload(){
   urls.map(function(url) {
     var el = document.createElement("script");
     el.src = url;
+    // el.async = false; // Enable this to allow concurrent downloading but synchronous execution
     document.body.appendChild(el);
   })
 }
