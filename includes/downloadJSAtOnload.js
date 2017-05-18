@@ -1,8 +1,9 @@
 function downloadJSAtOnload(){
-  urls.map(function(url) {
+  scripts.map(function(script) {
     var el = document.createElement("script");
-    el.src = url;
-    // el.async = false; // Enable this to allow concurrent downloading but synchronous execution
+    el.src = script.src;
+    el.async = !!script.async;
+    el.defer = !!script.defer;
     document.body.appendChild(el);
   })
 }

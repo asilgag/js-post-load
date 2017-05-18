@@ -57,15 +57,24 @@ class HtmlResponseAttachmentsProcessor extends \Drupal\Core\Render\HtmlResponseA
     }
 
     // get all JS paths to be loaded at page bottom
-    $jsToLoad = [];
+    $scriptsToLoad = [];
     foreach($variables['scripts_bottom'] as $key => $scriptsBottom) {
       if (!empty($scriptsBottom['#attributes']['src'])) {
-        $jsToLoad[] = '"'.$scriptsBottom['#attributes']['src'].'"';
+        $scriptsToLoad[] = $scriptsBottom['#attributes'];
         unset($variables['scripts_bottom'][$key]);
       }
     }
-    // create a JS string to call downloadJSAtOnload() function
-    $urlsToLoadArray = '['.implode(',', $jsToLoad).']';
+    // create a JS array with objects to call downloadJSAtOnload() function
+    $scriptsToLoadObject = [];
+    foreach ($scriptsToLoad as $scriptToLoad) {
+      $scriptToLoadObject  = '{';
+      $scriptToLoadObject .= 'src:"' . $scriptToLoad['src'] . '",';
+      $scriptToLoadObject .= 'async:' . (isset($scriptToLoad['async']) ? $scriptToLoad['async'] : 'false') . ',';
+      $scriptToLoadObject .= 'defer:' . (isset($scriptToLoad['defer']) ? $scriptToLoad['defer'] : 'false');
+      $scriptToLoadObject .= '}';
+      $scriptsToLoadObject[] = $scriptToLoadObject;
+    }
+    $scriptsToLoadArray = '['.implode(',', $scriptsToLoadObject).']';
 
     // Add varvy.com's downloadJSAtOnload
     // (https://varvy.com/pagespeed/defer-loading-javascript.html)
@@ -76,7 +85,7 @@ class HtmlResponseAttachmentsProcessor extends \Drupal\Core\Render\HtmlResponseA
     $variables['scripts_bottom'][] = [
       '#markup' => Markup::create(
         '<script>'.
-        str_replace('urls', $urlsToLoadArray, $downloadJSAtOnloadContent).
+        str_replace('scripts', $scriptsToLoadArray, $downloadJSAtOnloadContent).
         '</script>'
       )
     ];
