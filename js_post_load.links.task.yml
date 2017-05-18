@@ -1,4 +1,0 @@
-js_post_load.settings:
-  title: JS Post Load
-  route_name: js_post_load.settings
-  base_route: system.performance_settings
